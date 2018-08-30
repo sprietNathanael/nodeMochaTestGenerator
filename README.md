@@ -2,6 +2,11 @@
 
 Node library that generates and runs unit tests for mocha from Json description of functions.
 
+Those tests can be:
+- on the expected result of a function
+- on the `TypeError` throwing if a parameter is not correct
+- on the expected calling of a function inside the function to test
+
 Before describing a function, its parameters types has to be described.
 
 A parameter of a function is seen as a type coupled with a name.
