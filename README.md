@@ -190,7 +190,7 @@ Both functions takes a `complementaryTestSuite`. This test suite is an array of 
 | `expectedResult`          | any      | The expected result of the function call (only if a return is expected)                                                                                    |
 | `expectedFunction`        | Function | The function that is expected to be called (only if a function call is expected)                                                                           |
 | `expectedFunctionContext` | Object   | The context of the expected (only if a function call is expected)                                                                                          |
-| `expectedParameters`      | [any]    | An array of the expected parameters of the function call (only if a function call is expected). Leave it empty if the calls is expected without parameters |
+| `expectedParameters`      | [any]    | An array of the expected parameters of the function call (only if a function call is expected). Set to an empty array if the calls is expected without parameters. Set to undefined to test only the call, taking no accounts of the parameters |
 | `promise`                 | boolean  | Set it to `true` if the expected function call happens in a promise (mostly if the funciton to test is asynchronous)                                       |
 
 #### Example

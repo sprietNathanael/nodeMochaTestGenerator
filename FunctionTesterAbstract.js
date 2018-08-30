@@ -175,7 +175,7 @@ class FunctionTesterAbstract {
      * @param {Function} expectedFunctionContext The expected function to be called context
      * @param {[any]} resFunctionArgs The parameters of the expected function call
      */
-    runOneSuiteTestWithFunctionCallPromise(description, functionToTest, context, parametersToTest, expectedFunction, expectedFunctionContext, resFunctionArgs = []) {
+    runOneSuiteTestWithFunctionCallPromise(description, functionToTest, context, parametersToTest, expectedFunction, expectedFunctionContext, resFunctionArgs) {
         it('should call the function ' + description, (done) => {
 
             // Create a spy on the expected function
@@ -185,7 +185,11 @@ class FunctionTesterAbstract {
             functionToTest.apply(context, parametersToTest).then(() => {
                 try {
                     // assert that the spy has been called
-                    assert(mySpy.calledWithExactly.apply(mySpy, resFunctionArgs), true);
+                    if (resFunctionArgs !== undefined) {
+                        assert(mySpy.calledWithExactly.apply(mySpy, resFunctionArgs), true);
+                    } else {
+                        assert(mySpy.called, true);
+                    }
                     mySpy.restore();
                     done();
                 } catch (error) {
