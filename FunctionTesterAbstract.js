@@ -183,14 +183,15 @@ class FunctionTesterAbstract {
 
             // call the function and the assert in the then
             functionToTest.apply(context, parametersToTest).then(() => {
-                // assert that the spy has been called
-                assert(mySpy.calledWithExactly.apply(mySpy, resFunctionArgs), true);
-
-                // Restore the function
-                mySpy.restore();
-
-                // Call mocha "done" for async
-                done();
+                try {
+                    // assert that the spy has been called
+                    assert(mySpy.calledWithExactly.apply(mySpy, resFunctionArgs), true);
+                    mySpy.restore();
+                    done();
+                } catch (error) {
+                    mySpy.restore();
+                    done(error);
+                }
             });
 
         });
