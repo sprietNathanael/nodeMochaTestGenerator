@@ -1,0 +1,22 @@
+{
+  "name": "nodemochatestgenerator",
+  "version": "0.0.1",
+  "description": "Node library that generates and runs unit tests for mocha from Json description of functions.",
+  "main": "FunctionTesterAbstract.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sprietNathanael/nodeMochaTestGenerator.git"
+  },
+  "author": "Nathanaël Spriet",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/sprietNathanael/nodeMochaTestGenerator/issues"
+  },
+  "homepage": "https://github.com/sprietNathanael/nodeMochaTestGenerator#readme",
+  "dependencies": {
+    "sinon": "^6.1.5"
+  }
+}
