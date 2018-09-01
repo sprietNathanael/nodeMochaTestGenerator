@@ -43,12 +43,18 @@ class FunctionTesterAbstract {
     /**
      * Runs the complementary test suite
      */
-    runComplementaryTestSuite(){
+    runComplementaryTestSuite() {
         // Run each test of the complementary tests suite
         for (let test of this.complementaryTestSuite) {
             // If a result is expected
             if (test.expectedResult !== undefined) {
-                this.runOneSuiteTestWithResult(test.description, this.functionToTest, this.context, test.parametersToTest, test.expectedResult);
+                if (test.promise) {
+
+                    this.runOneSuiteTestWithResultWithinPromise(test.description, this.functionToTest, this.context, test.parametersToTest, test.expectedResult);
+                } else {
+
+                    this.runOneSuiteTestWithResult(test.description, this.functionToTest, this.context, test.parametersToTest, test.expectedResult);
+                }
             }
             // If a function call is expected
             else if (test.expectedFunction !== undefined) {
@@ -58,6 +64,12 @@ class FunctionTesterAbstract {
                 } else {
 
                     this.runOneSuiteTestWithFunctionCall(test.description, this.functionToTest, this.context, test.parametersToTest, test.expectedFunction, test.expectedFunctionContext, test.expectedParameters);
+                }
+            } else if (test.customTestFunction !== undefined) {
+                if (test.promise) {
+                    this.runCustomTestFunctionWithPromise(test.description, test.customTestFunction);
+                } else {
+                    this.runCustomTestFunction(test.description, test.customTestFunction);
                 }
             }
         }
@@ -137,6 +149,30 @@ class FunctionTesterAbstract {
     }
 
     /**
+     * Run a single test from a test suite that should return an object through a promise
+     * @param {String} description The description of the test condition
+     * @param {Function} functionToTest The function to test
+     * @param {Object} context The context of the function to test
+     * @param {[any]} parametersToTest The parameters to pass at the function
+     * @param {any} expectedResult The expected result
+     */
+    runOneSuiteTestWithResultWithinPromise(description, functionToTest, context, parametersToTest, expectedResult) {
+        it('should return ' + description, (done) => {
+
+            // call the function and the assert in the then
+            functionToTest.apply(context, parametersToTest).then((result) => {
+                try {
+                    assert(result, expectedResult);
+                    done();
+                } catch (error) {
+                    mySpy.restore();
+                    done(error);
+                }
+            });
+        });
+    }
+
+    /**
      * Run a single test from a test suite that should call a function with specified arguments (no arguments by default)
      * @param {String} description The description of the test condition
      * @param {Function} functionToTest The function to test
@@ -181,23 +217,54 @@ class FunctionTesterAbstract {
             // Create a spy on the expected function
             const mySpy = sinon.spy(expectedFunctionContext, expectedFunction.name);
 
-            // call the function and the assert in the then
-            functionToTest.apply(context, parametersToTest).then(() => {
-                try {
-                    // assert that the spy has been called
-                    if (resFunctionArgs !== undefined) {
-                        assert(mySpy.calledWithExactly.apply(mySpy, resFunctionArgs), true);
-                    } else {
-                        assert(mySpy.called, true);
+            try {
+                // call the function and the assert in the then
+                functionToTest.apply(context, parametersToTest).then(() => {
+                    try {
+                        // assert that the spy has been called
+                        if (resFunctionArgs !== undefined) {
+                            assert(mySpy.calledWithExactly.apply(mySpy, resFunctionArgs), true);
+                        } else {
+                            assert(mySpy.called, true);
+                        }
+                        mySpy.restore();
+                        done();
+                    } catch (error) {
+                        mySpy.restore();
+                        done(error);
                     }
-                    mySpy.restore();
-                    done();
-                } catch (error) {
-                    mySpy.restore();
-                    done(error);
-                }
-            });
+                });
 
+            } catch (error) {
+                mySpy.restore();
+                done(error);
+            }
+        });
+    }
+
+    /**
+     * Runs a custom test function without calling the function to test
+     * @param {String} description The description of the test
+     * @param {Function} customTestFunction The test function
+     */
+    runCustomTestFunction(description, customTestFunction) {
+        it(description, () => {
+            customTestFunction();
+        });
+    }
+
+    /**
+     * Runs a custom test function without calling the function to test that returns a promise
+     * @param {String} description The description of the test
+     * @param {Function} customTestFunction The test function
+     */
+    runCustomTestFunctionWithPromise(description, customTestFunction) {
+        it(description, (done) => {
+            customTestFunction().then(() => {
+                done()
+            }).catch((error) => {
+                done(error);
+            });
         });
     }
 }
